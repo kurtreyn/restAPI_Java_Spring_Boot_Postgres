@@ -13,9 +13,8 @@ public class User {
     @Column
     private String lastName;
     @Column
-    private int age;
-    @Column
-    private String occupation;
+    private String email;
+
 
     public long getId() {
         return id;
@@ -41,19 +40,7 @@ public class User {
         this.lastName = lastName;
     }
 
-    public int getAge() {
-        return age;
-    }
+    public String getEmail() { return email; }
 
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public String getOccupation() {
-        return occupation;
-    }
-
-    public void setOccupation(String occupation) {
-        this.occupation = occupation;
-    }
+    public void setEmail(String email) { this.email = email; }
 }
