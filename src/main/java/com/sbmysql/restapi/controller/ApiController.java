@@ -3,6 +3,8 @@ package com.sbmysql.restapi.controller;
 import com.sbmysql.restapi.models.User;
 import com.sbmysql.restapi.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +24,31 @@ public class ApiController {
     public List<User> getUsers() {
         return userRepo.findAll();
     }
+
+    @GetMapping("/users/{id}")
+    public User getUser(@PathVariable long id) {
+        return userRepo.findById(id).get();
+    }
+
+    @GetMapping("/users/email")
+    public User getUserByEmail(@RequestParam String email) {
+//        http://localhost:8080/users/email?email=kurt@email.com
+        return userRepo.findByEmail(email);
+    }
+
+    @GetMapping("/users/name")
+    public User getUserByName(@RequestParam String name) {
+//        http://localhost:8080/users/name?name=Kurt
+        return userRepo.findByFirstName(name);
+    }
+
+//    @GetMapping("/users/name")
+//    public ResponseEntity<List<User>> getUserByName(@RequestParam String name) {
+//        List username = userRepo.findByFirstName(name);
+//        System.out.println("username: " + username);
+//        return new ResponseEntity<List<User>>(userRepo.findByFirstName(name), HttpStatus.OK);
+//    }
+
 
     @PostMapping("/users")
     public String saveUser(@RequestBody User user) {
