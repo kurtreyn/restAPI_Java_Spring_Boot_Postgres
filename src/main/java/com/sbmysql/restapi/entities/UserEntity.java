@@ -1,6 +1,9 @@
 package com.sbmysql.restapi.entities;
 
 import jakarta.persistence.*;
+import java.util.Base64;
+import java.util.Base64.Encoder;
+import java.util.Base64.Decoder;
 
 @Entity
 @Table(name = "users_db")
@@ -12,6 +15,9 @@ public class UserEntity {
     private String name;
     @Column
     private String email;
+
+    @Column
+    private String password;
 
 
     public long getId() {
@@ -31,4 +37,14 @@ public class UserEntity {
     public String getEmail() { return email; }
 
     public void setEmail(String email) { this.email = email; }
+
+    public String getPassword() {
+        Decoder decoder = Base64.getDecoder();
+        return new String(decoder.decode(password));
+    }
+
+    public void setPassword(String password) {
+        Encoder encoder = Base64.getEncoder();
+        this.password = encoder.encodeToString(password.getBytes());
+    }
 }

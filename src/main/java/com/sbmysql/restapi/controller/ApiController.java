@@ -86,11 +86,13 @@ public class ApiController {
         }
     }
 
+    @CrossOrigin(origins = "http://localhost:4200")
     @PostMapping("/users")
     public ResponseEntity saveUser(@RequestBody UserModel user) {
         UserEntity userEntity = new UserEntity();
         userEntity.setName(user.getName());
         userEntity.setEmail(user.getEmail());
+        userEntity.setPassword(user.getPassword());
         userRepo.save(userEntity);
         return new ResponseEntity(user, HttpStatus.CREATED);
     }
