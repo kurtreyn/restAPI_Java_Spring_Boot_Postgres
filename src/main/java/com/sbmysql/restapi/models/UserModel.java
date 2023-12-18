@@ -51,6 +51,7 @@ public class UserModel {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
+                ", password='**********" + '\'' +
                 '}';
     }
 }
