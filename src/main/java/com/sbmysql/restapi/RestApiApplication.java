@@ -2,6 +2,10 @@ package com.sbmysql.restapi;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
 
 @SpringBootApplication
 public class RestApiApplication {
@@ -10,5 +14,23 @@ public class RestApiApplication {
 		SpringApplication.run(RestApiApplication.class, args);
 
 	}
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/").allowedOrigins("http://localhost:4200");
+                registry.addMapping("/wakeup").allowedOrigins("http://localhost:4200");
+                registry.addMapping("/users").allowedOrigins("http://localhost:4200");
+                registry.addMapping("/users/{id}").allowedOrigins("http://localhost:4200");
+                registry.addMapping("/users/email").allowedOrigins("http://localhost:4200");
+                registry.addMapping("/").allowedOrigins("http://localhost:4200");
+                registry.addMapping("/signup").allowedOrigins("http://localhost:4200");
+                registry.addMapping("/login").allowedOrigins("http://localhost:4200");
+
+            }
+        };
+    }
 
 }

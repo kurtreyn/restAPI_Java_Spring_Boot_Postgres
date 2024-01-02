@@ -36,22 +36,37 @@ public class UserModel {
     public void setEmail(String email) { this.email = email; }
 
     public String getPassword() {
-        Decoder decoder = Base64.getDecoder();
-        return new String(decoder.decode(password));
+        Base64.Decoder decoder = Base64.getDecoder();
+        if (password == null) {
+            return null;
+        }
+
+        try {
+            String decodedPassword = new String(decoder.decode(password));
+            return decodedPassword;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public void setPassword(String password) {
-        Encoder encoder = Base64.getEncoder();
+        Base64.Encoder encoder = Base64.getEncoder();
+        if (password == null) {
+            throw new IllegalArgumentException("Password cannot be null");
+        }
+
+        encoder = Base64.getEncoder();
         this.password = encoder.encodeToString(password.getBytes());
     }
 
     @Override
     public String toString() {
         return "UserModel{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                ", password='**********" + '\'' +
-                '}';
+               "id=" + id +
+               ", name='" + name + '\'' +
+               ", email='" + email + '\'' +
+               ", password='**********" + '\'' +
+               '}';
     }
 }

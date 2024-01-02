@@ -9,22 +9,29 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
 public class ApiController {
-//    @Autowired
     UserRepo userRepo;
 
     public ApiController(UserRepo userRepo) {
         this.userRepo = userRepo;
     }
 
-
     @GetMapping("/")
     public String getPage() {
         return "Server is running";
+    }
+
+    @GetMapping("/wakeup")
+    public ResponseEntity<HashMap<String, String>> wakeup() {
+        HashMap<String, String> response = new HashMap<>();
+        response.put("status", "ready");
+        System.out.println("response: " + response);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/users")
@@ -41,7 +48,6 @@ public class ApiController {
         return new ResponseEntity<List<UserModel>>(userModels, HttpStatus.OK);
     }
 
-
     @GetMapping("/users/{id}")
     public ResponseEntity<UserModel> getUser(@PathVariable long id) {
         UserEntity user = userRepo.findById(id).get();
@@ -52,10 +58,8 @@ public class ApiController {
         return new ResponseEntity<>(userModel, HttpStatus.OK);
     }
 
-
     @GetMapping("/users/email")
     public ResponseEntity<UserModel> getUserByEmail(@RequestParam String email) {
-//        http://localhost:8080/users/email?email=kurt@email.com
         Optional<UserEntity> userOptional = Optional.ofNullable(userRepo.findByEmail(email));
         if (!userOptional.isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -69,10 +73,8 @@ public class ApiController {
         }
     }
 
-
     @GetMapping("/users/name")
     public ResponseEntity<UserModel> getUserByName(@RequestParam String name) {
-//        http://localhost:8080/users/name?name=Kurt
         Optional<UserEntity> userOptional = Optional.ofNullable(userRepo.findByName(name));
         if (userOptional.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -86,17 +88,37 @@ public class ApiController {
         }
     }
 
-    @CrossOrigin(origins = "http://localhost:4200")
-    @PostMapping("/users")
+
+    @PostMapping("/signup")
     public ResponseEntity saveUser(@RequestBody UserModel user) {
         UserEntity userEntity = new UserEntity();
         userEntity.setName(user.getName());
         userEntity.setEmail(user.getEmail());
         userEntity.setPassword(user.getPassword());
         userRepo.save(userEntity);
+        System.out.println("saved user: " + user.getName());
         return new ResponseEntity(user, HttpStatus.CREATED);
     }
 
+    @PostMapping("/login")
+    public ResponseEntity loginUser(@RequestBody UserModel user) {
+        UserEntity userEntity = new UserEntity();
+        String givenEmail = user.getEmail();
+        String givenPassword = user.getPassword();
+        userEntity = userRepo.findByEmail(givenEmail);
+        System.out.println(userEntity);
+        if (userEntity == null) {
+            return new ResponseEntity("User not found", HttpStatus.NOT_FOUND);
+        } else {
+            String actualPassword = userEntity.getPassword();
+            if (givenPassword.equals(actualPassword)) {
+                System.out.println("logging user in: " + user.getName());
+                return new ResponseEntity(user, HttpStatus.OK);
+            } else {
+                return new ResponseEntity("Incorrect password", HttpStatus.UNAUTHORIZED);
+            }
+        }
+    }
 
     @PutMapping("/users/{id}")
     public ResponseEntity updateUser(@PathVariable long id, @RequestBody UserModel user){
@@ -106,10 +128,17 @@ public class ApiController {
         userRepo.save(updatedUser);
         return new ResponseEntity(user, HttpStatus.OK);
     }
-
     @DeleteMapping("/users/{id}")
     public ResponseEntity deleteUser(@PathVariable long id) {
-        userRepo.deleteById(id);
-        return new ResponseEntity("user deleted",HttpStatus.OK);
+        try {
+            if(userRepo.findById(id).isPresent()) {
+                userRepo.deleteById(id);
+                return new ResponseEntity(HttpStatus.OK);
+            } else {
+                return new ResponseEntity(HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
